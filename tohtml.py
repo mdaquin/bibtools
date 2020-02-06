@@ -23,7 +23,15 @@ for key in bib_data.entries:
     entry = bib_data.entries[key]
     title = ""
     venue = ""
+    url = ""
     st = '<span class="bib_authors">'    
+    if "url" in entry.fields and entry.fields["url"]!="":
+        url = entry.fields["url"]
+    elif "doi" in entry.fields and entry.fields["doi"]!="":
+        if "http" in entry.fields["doi"]:
+            url=entry.fields["doi"]
+        else:
+            url="https://doi.org/"+entry.fields["doi"]
     if "author" in entry.persons:
         first = True
         for pers in entry.persons["author"]:
@@ -37,9 +45,12 @@ for key in bib_data.entries:
                 st = st + " "+str(pers.middle_names[0]).encode('utf-8').decode('utf-8')
             if len(pers.last_names) > 0:
                 st = st + " " +str(pers.last_names[0].encode('utf-8')).decode('utf-8')
-            st = st + '</span>'    
+            st = st + '</span>'
+        st = st + '</span>'
     if "title" in entry.fields:
         title = entry.fields["title"].encode('utf-8').decode('utf-8')
+    if url=="" and title!="":
+        url='https://scholar.google.com/scholar?hl=en&as_sdt=0&q=%22'+title.replace(' ','+')+'%22'
     if "author" in entry.fields:
         author = entry.fields["author"]
     if "journal" in entry.fields:
@@ -55,7 +66,7 @@ for key in bib_data.entries:
         date = str(entry.fields["year"])+"-"
     if "month" in entry.fields:
         date = date + str(entry.fields["month"])
-    ast = '<p class="bib_entry" id="bib_'+key+'">'+'<span class="bib_title">'+title+'</span>'+st+'<span class="bib_venue">'+venue+'</span>'+'</p>'
+    ast = '<p class="bib_entry" id="bib_'+key+'">'+'<span class="bib_title"><a href="'+url+'">'+title+'</a></span>'+st+'<span class="bib_venue">'+venue+'</span>'+'</p>'
     if date not in all_bibs:
         all_bibs[date] = []
     all_bibs[date].append(ast)
